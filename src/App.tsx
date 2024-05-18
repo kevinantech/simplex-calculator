@@ -1,16 +1,27 @@
-import { useState } from "react";
-import { StartCard } from "./components";
+import { ModelForm, StartCard } from "@/components";
+import { AppContext, ContextValue } from "@/contexts/app.context";
+import { useNumberOfVariables } from "@/hooks";
+import { useMemo } from "react";
 
 export default function App() {
-  const [varsQuantity, setVarsQuantity] = useState<number>();
+  const { numberOfVariables, setNumberOfVariablesCallback } =
+    useNumberOfVariables();
+
+  const value: ContextValue = useMemo(
+    () => ({
+      numberOfVariables: {
+        value: numberOfVariables,
+        dispatch: setNumberOfVariablesCallback,
+      },
+    }),
+    [numberOfVariables, setNumberOfVariablesCallback]
+  );
+
   return (
-    <main className="flex flex-col items-center pt-10">
-      <StartCard
-        onChange={(e) => {
-          if (e.target.value && !isNaN(Number(e.target.value)))
-            setVarsQuantity(Number(e.target.value));
-        }}
-      />
-    </main>
+    <AppContext.Provider value={value}>
+      <main className="flex flex-col items-center pt-10">
+        {value.numberOfVariables.value === 0 ? <StartCard /> : <ModelForm />}
+      </main>
+    </AppContext.Provider>
   );
 }
