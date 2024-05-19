@@ -1,4 +1,4 @@
-import { EObjective } from "@/constants/enums";
+import { EObjectiveType } from "@/constants/enums";
 import React from "react";
 import { Title } from "..";
 
@@ -16,10 +16,10 @@ const ObjetiveForm: React.FC<ObjetiveFormProps> = () => {
       <Title>Objetivo: </Title>
       <select
         className="text-sm py-1 px-2 rounded-lg bg-white bg-opacity-80 transition-colors duration-200 hover:bg-opacity-100 focus:outline-none"
-        defaultValue={EObjective.MAX}
+        defaultValue={EObjectiveType.MAX}
       >
-        <option value={EObjective.MAX}>Maximizar</option>
-        <option value={EObjective.MIN}>Minimizar</option>
+        <option value={EObjectiveType.MAX}>Maximizar</option>
+        <option value={EObjectiveType.MIN}>Minimizar</option>
       </select>
     </div>
   );

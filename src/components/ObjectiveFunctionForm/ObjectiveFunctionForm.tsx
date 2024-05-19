@@ -1,49 +1,47 @@
-import { AppContext } from "@/contexts/app.context";
-import { generateKey } from "@/utils";
-import React, { useContext, useMemo } from "react";
-import { Title, VarInput } from "..";
+import { OFTerm } from "@/core/of-terms";
+import React from "react";
 import { useForm } from "react-hook-form";
+import { Title, VarInput } from "..";
 
 type DynamicObject = { [key: string]: number };
 
-const generateKeys = (length: number): string[] => {
-  const keys: string[] = [];
-  for (let i = 0; i < length; i++) keys.push(generateKey());
-  return keys;
-};
+export interface ObjectiveFunctionFormProps {
+  terms: OFTerm[];
+}
 
-export interface ObjectiveFunctionFormProps {}
-
-const ObjectiveFunctionForm: React.FC<ObjectiveFunctionFormProps> = () => {
-  const { numberOfVariables } = useContext(AppContext);
-  const keys = useMemo(() => generateKeys(numberOfVariables.value), []);
-
+const ObjectiveFunctionForm: React.FC<ObjectiveFunctionFormProps> = ({ terms }) => {
   // Por defecto los coeficientes de las variables son 0.
-  const defaultValues = keys.reduce((acc: DynamicObject, key) => {
+  const defaultValues = terms.reduce((acc: DynamicObject, { key }) => {
     acc[key] = 0;
     return acc;
   }, {});
 
-  const { register } = useForm({ defaultValues });
+  const { register, handleSubmit } = useForm({ defaultValues });
 
   return (
-    <div>
+    <form
+      className="flex flex-col"
+      onSubmit={handleSubmit((data) => {
+        console.log("🚀 data:", data);
+      })}
+    >
       <Title>Función Objetivo</Title>
       <div className="flex flex-wrap">
-        {keys.map((key, index) => {
+        {terms.map(({ key, subindex }) => {
           return (
             <VarInput
               className="mt-5"
-              addition={index > 0 ? "left" : undefined}
+              addition={subindex > 1 ? "left" : undefined}
               key={key}
-              subindex={index + 1}
-              {...register(key)}
+              subindex={subindex}
+              {...register(key, { setValueAs: (value) => Number(value) })}
             />
           );
         })}
       </div>
       <Title className="mt-5">Restricciones</Title>
-    </div>
+      <button type="submit">Submit</button>
+    </form>
   );
 };
 
