@@ -7,6 +7,9 @@ export default {
       colors: {
         ...Color,
       },
+      screens: {
+        "semi-sm": "448px",
+      },
     },
   },
   plugins: [],

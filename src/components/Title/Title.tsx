@@ -7,9 +7,7 @@ export interface TitleProps {
 
 const Title: React.FC<TitleProps> = ({ children, className }) => {
   return (
-    <p className={`font-semibold text-gray-300 ${className ?? ""}`}>
-      {children}
-    </p>
+    <p className={`font-semibold text-lg text-gray-300 ${className ?? ""}`}>{children}</p>
   );
 };
 
