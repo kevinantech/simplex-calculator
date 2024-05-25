@@ -24,47 +24,45 @@ const genateOFTerms = (length: number): OFTerm[] => {
   return terms;
 };
 
+const generateConstraintIds = (length: number): number[] => {
+  const constraintIds: number[] = [];
+  for (let i = 0; i < length; i++) constraintIds[i] = i;
+  return constraintIds;
+};
+
 export interface ModelFormProps {}
 
 const ModelForm: React.FC<ModelFormProps> = () => {
-  const { numberOfVariables } = useContext(AppContext);
+  const { numberOfVariables, numberOfConstraints } = useContext(AppContext);
   const ofTerms = useMemo<OFTerm[]>(() => genateOFTerms(numberOfVariables.value), []);
+  const constraintIds = useMemo<number[]>(
+    () => generateConstraintIds(numberOfConstraints.value),
+    []
+  );
   const { register, handleSubmit } = useForm<ModelFormType>();
-  const [numberOfConstraints, setNumberOfConstraints] = useState<number[]>([1]);
-
-  /* Incrementa de la siguiente manera: [1] => [1, 2] => [1,2,3] */
-  const incrementNumberOfConstraints = () =>
-    setNumberOfConstraints((prevState) => [
-      ...prevState,
-      prevState[prevState.length - 1] + 1,
-    ]);
 
   return (
     <form
       className="flex flex-col mx-8 items-center py-8 px-10 rounded-2xl backdrop-blur-[8px] bg-white bg-opacity-15 shadow-lg"
       onSubmit={handleSubmit(
-        (data) => console.log("data: ", { data, numberOfConstraints }),
+        (data) => console.log("data: ", { data }),
         () => {}
       )}
     >
       <ObjectiveField {...register("objective", { required: true })} />
       <ObjectiveFunctionField register={register} terms={ofTerms} />
-      {numberOfConstraints.map((numberOfConstraint) => (
+      {constraintIds.map((constraintId) => (
         <ConstraintField
-          key={`ConstraintField-${numberOfConstraint}`}
+          key={`ConstraintField-${constraintId}`}
+          constraintId={constraintId}
           register={register}
           terms={ofTerms}
-          numberOfContraint={numberOfConstraint}
+          numberOfContraint={constraintId + 1}
         />
       ))}
-      <div className="flex flex-col gap-3 semi-sm:flex-row mt-12">
-        <Button onClick={incrementNumberOfConstraints} type="button">
-          Añadir restricción
-        </Button>
-        <Button className="self-center" type="submit">
-          Calcular
-        </Button>
-      </div>
+      <Button className="mt-8" type="submit">
+        Calcular
+      </Button>
     </form>
   );
 };

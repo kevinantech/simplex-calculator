@@ -1,10 +1,12 @@
 import { ModelForm, StartCard } from "@/components";
 import { AppContext, ContextValue } from "@/contexts/app.context";
-import { useNumberOfVariables } from "@/hooks";
+import { useNumberOfConstraints, useNumberOfVariables } from "@/hooks";
 import { useMemo } from "react";
 
 export default function App() {
   const { numberOfVariables, setNumberOfVariablesCallback } = useNumberOfVariables();
+  const { numberOfConstraints, setNumberOfConstraintsCallback } =
+    useNumberOfConstraints();
 
   const value: ContextValue = useMemo(
     () => ({
@@ -12,8 +14,17 @@ export default function App() {
         value: numberOfVariables,
         dispatch: setNumberOfVariablesCallback,
       },
+      numberOfConstraints: {
+        value: numberOfConstraints,
+        dispatch: setNumberOfConstraintsCallback,
+      },
     }),
-    [numberOfVariables, setNumberOfVariablesCallback]
+    [
+      numberOfConstraints,
+      numberOfVariables,
+      setNumberOfConstraintsCallback,
+      setNumberOfVariablesCallback,
+    ]
   );
 
   return (

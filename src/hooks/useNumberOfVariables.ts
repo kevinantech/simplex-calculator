@@ -7,10 +7,7 @@ const useNumberOfVariables = () => {
     []
   );
 
-  return {
-    numberOfVariables,
-    setNumberOfVariablesCallback,
-  };
+  return { numberOfVariables, setNumberOfVariablesCallback };
 };
 
 export default useNumberOfVariables;

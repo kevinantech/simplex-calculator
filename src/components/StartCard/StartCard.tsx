@@ -7,6 +7,7 @@ export interface StartCardProps {}
 
 type FormType = {
   numberOfVars: number;
+  numberOfConstraints: number;
 };
 
 const StartCard: React.FC<StartCardProps> = () => {
@@ -20,13 +21,14 @@ const StartCard: React.FC<StartCardProps> = () => {
   return (
     <form
       className="flex flex-col items-center w-80 py-8 rounded-2xl backdrop-blur-[8px] bg-white bg-opacity-15 shadow"
-      onSubmit={handleSubmit(({ numberOfVars: number }) =>
-        context.numberOfVariables.dispatch(number)
-      )}
+      onSubmit={handleSubmit((data) => {
+        context.numberOfVariables.dispatch(data.numberOfVars);
+        context.numberOfConstraints.dispatch(data.numberOfConstraints);
+      })}
     >
-      <Title>Número de variables</Title>
+      <Title className="mb-4">Número de variables</Title>
       <input
-        className="block my-5 w-16 rounded py-2 px-3 font-semibold text-gray-200 bg-white bg-opacity-25"
+        className="block w-16 rounded py-2 px-3 font-semibold text-gray-200 bg-white bg-opacity-25"
         type="number"
         {...register("numberOfVars", {
           min: { value: 1, message: "Debe haber al menos una variable." },
@@ -34,12 +36,28 @@ const StartCard: React.FC<StartCardProps> = () => {
           required: "Ingrese el número de variables.",
         })}
       />
-      <Button type="submit">Iniciar</Button>
       {!!errors.numberOfVars?.message && (
-        <p className="mt-4 rounded-lg text-sm text-red-500">
+        <p className="mt-3 rounded-lg text-sm text-red-500">
           {errors.numberOfVars.message}
         </p>
       )}
+      <Title className="mt-6 mb-4">Número de Restricciones</Title>
+      <input
+        className="block w-16 rounded py-2 px-3 font-semibold text-gray-200 bg-white bg-opacity-25"
+        type="number"
+        {...register("numberOfConstraints", {
+          min: { value: 1, message: "Debe haber al menos una restricción." },
+          required: "Ingrese el número de restricciones.",
+        })}
+      />
+      {!!errors.numberOfConstraints?.message && (
+        <p className="mt-3 rounded-lg text-sm text-red-500">
+          {errors.numberOfConstraints.message}
+        </p>
+      )}
+      <Button className="mt-8" type="submit">
+        Iniciar
+      </Button>
     </form>
   );
 };

@@ -5,6 +5,10 @@ export type ContextValue = {
     value: number;
     dispatch: (payload: number) => void;
   };
+  numberOfConstraints: {
+    value: number;
+    dispatch: (payload: number) => void;
+  };
 };
 
 export const AppContext = createContext({} as ContextValue);
