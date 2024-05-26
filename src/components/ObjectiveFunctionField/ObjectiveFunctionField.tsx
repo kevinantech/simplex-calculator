@@ -1,12 +1,14 @@
-import { OFTerm } from "@/core/of-terms";
+import { Term } from "@/core/term.model";
 import React from "react";
 import { UseFormRegister } from "react-hook-form";
 import { ModelFormType, Title, VarInput } from "..";
 import { EVariableType } from "@/constants";
 
+export const parentKey = "objectiveFunction";
+
 export interface ObjectiveFunctionFieldProps {
   register: UseFormRegister<ModelFormType>;
-  terms: OFTerm[];
+  terms: Term[];
 }
 
 const ObjectiveFunctionField: React.FC<ObjectiveFunctionFieldProps> = ({
@@ -25,7 +27,7 @@ const ObjectiveFunctionField: React.FC<ObjectiveFunctionFieldProps> = ({
               key={key}
               subindex={subindex}
               variableType={EVariableType.NON_BASIC}
-              {...register(["ofTerms", key].join("."), {
+              {...register([parentKey, key].join(".") as keyof ModelFormType, {
                 setValueAs: (value) => Number(value),
               })}
             />

@@ -1,14 +1,21 @@
 import { EVariableType } from "@/constants";
-import { OFTerm } from "@/core/of-terms";
+import { Term } from "@/core/term.model";
 import React from "react";
 import { UseFormRegister } from "react-hook-form";
-import { ConstraintSelect, ModelFormType, Title, VarInput } from "..";
+import {
+  ConstraintSelect,
+  ModelFormType,
+  Title,
+  VarInput,
+  keyConstraintType,
+  parentKeyConstraints,
+} from "..";
 
 export interface ConstraintsFieldProps {
   constraintId: number;
   numberOfContraint: number;
   register: UseFormRegister<ModelFormType>;
-  terms: OFTerm[];
+  terms: Term[];
 }
 
 const ConstraintField: React.FC<ConstraintsFieldProps> = ({
@@ -29,23 +36,37 @@ const ConstraintField: React.FC<ConstraintsFieldProps> = ({
               key={key}
               subindex={subindex}
               variableType={EVariableType.NON_BASIC}
-              {...register(["constraints", constraintId, key].join("."), {
-                setValueAs: (value) => Number(value),
-              })}
+              {...register(
+                [parentKeyConstraints, constraintId, key].join(
+                  "."
+                ) as keyof ModelFormType,
+                {
+                  setValueAs: (value) => Number(value),
+                }
+              )}
             />
           );
         })}
         <ConstraintSelect
           className="mt-5"
-          {...register(["constraints", constraintId, "type"].join("."))}
+          {...register(
+            [parentKeyConstraints, constraintId, keyConstraintType].join(
+              "."
+            ) as keyof ModelFormType
+          )}
         />
         <VarInput
           className="mt-5"
           subindex={numberOfContraint}
           variableType={EVariableType.LIMIT}
-          {...register(["constraints", constraintId, EVariableType.LIMIT].join("."), {
-            setValueAs: (value) => Number(value),
-          })}
+          {...register(
+            [parentKeyConstraints, constraintId, EVariableType.LIMIT].join(
+              "."
+            ) as keyof ModelFormType,
+            {
+              setValueAs: (value) => Number(value),
+            }
+          )}
         />
       </div>
     </>
