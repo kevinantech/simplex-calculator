@@ -76,6 +76,7 @@ const ModelForm: React.FC<ModelFormProps> = () => {
 
     /**
      * Añade las variables artificiales y de holgura a la funcion objetivo.
+     * TODO: Hacer lo mismo para la minimizacion.
      */
     if (objective === EObjectiveType.MAX) {
       constraints.forEach(({ type }, index) => {
@@ -98,13 +99,22 @@ const ModelForm: React.FC<ModelFormProps> = () => {
       });
     }
 
-    // Log: Funcion objetivo estandarizada
-    console.log("newObjectiveFunction", { newObjectiveFunction });
+    /**
+     * Extrae las variables auxiliares de la funcion objetivo estandarizada.
+     */
+    const auxiliaryVariables = newObjectiveFunction.filter((newObjectiveFunctionTerm) => {
+      const condition =
+        objectiveFunctionMemo.some(
+          (initialObjectiveFunctionTerm) =>
+            initialObjectiveFunctionTerm.key === newObjectiveFunctionTerm.key
+        ) === false;
+      return condition;
+    });
 
     /**
      * Estandariza las restricciones
      */
-
+    const constraintNumber: number = 1;
     for (const { K, type, ...nonBasicVariables } of constraints) {
       const constraint: Term[] = [...objectiveFunctionMemo];
 
@@ -118,34 +128,21 @@ const ModelForm: React.FC<ModelFormProps> = () => {
       }
 
       /**
-       * Añade los coeficientes de las variables basicas a las restricciones;
+       * Añade los coeficientes de las variables auxiliares las restricciones;
        */
-      const auxiliaryVariables = newObjectiveFunction.filter(
-        (newObjectiveFunctionTerm) => {
-          const condition =
-            objectiveFunctionMemo.some(
-              (initialObjectiveFunctionTerm) =>
-                initialObjectiveFunctionTerm.key === newObjectiveFunctionTerm.key
-            ) === false;
-          return condition;
-        }
-      );
 
-      newConstraints.push();
+      //
+
+      /* const auxiliarVariablesOfConstraint: Term[] = auxiliaryVariables.map((term) => {
+        if (type === EConstraintType.LESS) term.setCoefficient();
+          if (type === EConstraintType.MORE) term.setCoefficient();
+            if (type === EConstraintType.EQUAL) term.setCoefficient();
+        return term;
+      }); */
     }
 
-    /* constraints.forEach((constraint, index) => {
-        const constraintNumber = index + 1;
-
-        if (objective === EObjectiveType.MAX)
-          objectiveFunctionMemo[
-            EVariableType.SLACK + termDelimiter + constraintNumber
-          ] = 0;
-        else if (objective === EObjectiveType.MIN)
-          objectiveFunctionMemo[
-            EVariableType.SLACK + termDelimiter + constraintNumber
-          ] = 0;
-      }); */
+    // Log: Funcion objetivo estandarizada
+    console.log("newObjectiveFunction", { newObjectiveFunction });
   };
 
   return (
