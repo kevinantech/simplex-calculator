@@ -47,6 +47,7 @@ const StartCard: React.FC<StartCardProps> = () => {
         type="number"
         {...register("numberOfConstraints", {
           min: { value: 1, message: "Debe haber al menos una restricción." },
+          max: { value: 50, message: "El limite de restricciones es 50." },
           required: "Ingrese el número de restricciones.",
         })}
       />

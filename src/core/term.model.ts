@@ -20,7 +20,11 @@ export class Term {
     this.type = type;
   }
 
-  setCoefficient(coefficient: number) {
+  public setCoefficient(coefficient: number) {
     this.coefficient = coefficient;
+  }
+
+  clone(): Term {
+    return new Term(this.type, this.subindex, this.coefficient, this.isArtificial);
   }
 }

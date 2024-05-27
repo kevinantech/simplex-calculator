@@ -7,3 +7,19 @@ AUTORES:
 - DIOGO RODRIGUEZ ACEVEDO
 - JUAN DAVID NARVAEZ TORRES
 - JUAN SEBASTIAN PATERNINA PAREJA
+
+/\*\*
+_ Extrae las variables auxiliares de la funcion objetivo estandarizada.
+_/
+const auxiliaryVariables = newObjectiveFunction.filter((newObjectiveFunctionTerm) => {
+const condition =
+objectiveFunctionMemo.some(
+(initialObjectiveFunctionTerm) =>
+initialObjectiveFunctionTerm.key === newObjectiveFunctionTerm.key
+) === false;
+return condition;
+});
+const emptyAuxiliaryVariables = auxiliaryVariables.map((term) => {
+term.setCoefficient(0);
+return term;
+});
