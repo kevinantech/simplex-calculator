@@ -82,7 +82,6 @@ const ModelForm: React.FC<ModelFormProps> = () => {
     if (objective === EObjectiveType.MAX) {
       constraints.forEach(({ type }, index) => {
         const constraintNumber = index + 1;
-
         if (type === EConstraintType.LESS) {
           auxiliaryVariables.push(new Term(EVariableType.SLACK, constraintNumber));
         } else if (type === EConstraintType.MORE) {
@@ -118,6 +117,12 @@ const ModelForm: React.FC<ModelFormProps> = () => {
       /**
        * Añade los coeficientes de las variables auxiliares las restricciones;
        */
+
+      constraint.push(
+        ...auxiliaryVariables.map((term) => {
+          return term;
+        })
+      );
       if (type === EConstraintType.LESS) {
         constraint.push(new Term(EVariableType.SLACK, constraintNumber, 1));
       } else if (type === EConstraintType.MORE) {

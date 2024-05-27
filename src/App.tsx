@@ -32,6 +32,12 @@ export default function App() {
       <main className="flex flex-col items-center mb-16 pt-10">
         {value.numberOfVariables.value === 0 ? <StartCard /> : <ModelForm />}
       </main>
+      <footer className="flex flex-col items-center">
+        <p className="mb-2 text-xs text-gray-300">
+          Kevin Gomez, Boris Bello, Diogo Rodriguez, Juan Narvaez & Juan Paternina.
+        </p>
+        <p className="text-xs text-gray-300"> © 2024</p>
+      </footer>
     </AppContext.Provider>
   );
 }
