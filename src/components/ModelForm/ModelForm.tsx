@@ -27,7 +27,11 @@ export type ModelFormType = {
   })[];
 };
 
-/* OFTerms = Objective Function Terms */
+export type LimitTerm = {
+  coefficient: number;
+  subindex: number;
+};
+
 const generateObjectiveFunction = (length: number): Term[] => {
   const terms: Term[] = [];
   for (let i = 1; i <= length; i++) {
@@ -60,9 +64,9 @@ const ModelForm: React.FC<ModelFormProps> = () => {
   const { register, handleSubmit } = useForm<ModelFormType>();
 
   const handleCalculation = (data: ModelFormType) => {
-    console.log("data: ", { data });
     const { constraints, objectiveFunction: objectiveFunctionFromData, objective } = data;
     const newConstraints: Term[][] = [];
+    const limits: LimitTerm[] = [];
 
     /**
      * Añade los coeficientes a las variables no basicas.
@@ -96,7 +100,6 @@ const ModelForm: React.FC<ModelFormProps> = () => {
         }
       });
     }
-
     newObjectiveFunction.push(...auxiliaryVariables);
 
     /**
@@ -152,12 +155,14 @@ const ModelForm: React.FC<ModelFormProps> = () => {
         })
       );
 
-      constraintNumber++;
       newConstraints.push(constraint);
+      limits.push({ coefficient: K, subindex: constraintNumber });
+      constraintNumber++;
     }
 
     console.log("newObjectiveFunction", { newObjectiveFunction });
     console.log("newConstraints", { newConstraints });
+    console.log("limits", { limits });
   };
 
   return (
