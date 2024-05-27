@@ -117,24 +117,40 @@ const ModelForm: React.FC<ModelFormProps> = () => {
       /**
        * Añade los coeficientes de las variables auxiliares las restricciones;
        */
-
       constraint.push(
         ...auxiliaryVariables.map((term) => {
-          return term;
+          const termWithoutRef = term.clone();
+          if (termWithoutRef.subindex === constraintNumber) {
+            if (type === EConstraintType.LESS) {
+              termWithoutRef.setCoefficient(1);
+              return termWithoutRef;
+            }
+            if (
+              type === EConstraintType.MORE &&
+              termWithoutRef.type === EVariableType.SLACK
+            ) {
+              termWithoutRef.setCoefficient(-1);
+              return termWithoutRef;
+            }
+            if (
+              type === EConstraintType.MORE &&
+              termWithoutRef.type === EVariableType.ARTIFICIAL
+            ) {
+              termWithoutRef.setCoefficient(1);
+              return termWithoutRef;
+            }
+            if (
+              type === EConstraintType.EQUAL &&
+              termWithoutRef.type === EVariableType.ARTIFICIAL
+            ) {
+              termWithoutRef.setCoefficient(1);
+              return termWithoutRef;
+            }
+          }
+          termWithoutRef.setCoefficient(0);
+          return termWithoutRef;
         })
       );
-      if (type === EConstraintType.LESS) {
-        constraint.push(new Term(EVariableType.SLACK, constraintNumber, 1));
-      } else if (type === EConstraintType.MORE) {
-        constraint.push(new Term(EVariableType.SLACK, constraintNumber, -1));
-        constraint.push(new Term(EVariableType.ARTIFICIAL, constraintNumber, 1, true));
-      } else if (type === EConstraintType.EQUAL) {
-        constraint.push(new Term(EVariableType.ARTIFICIAL, constraintNumber, 1, true));
-      }
-
-      /**
-       * Completa las variables auxiliares de la restriccion.
-       */
 
       constraintNumber++;
       newConstraints.push(constraint);
