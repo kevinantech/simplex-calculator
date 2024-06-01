@@ -1,8 +1,8 @@
+import { EVariableType } from "@/constants";
 import { Term } from "@/core/term.model";
 import React from "react";
 import { UseFormRegister } from "react-hook-form";
 import { ModelFormType, Title, VarInput } from "..";
-import { EVariableType } from "@/constants";
 
 export const parentKey = "objectiveFunction";
 
@@ -12,8 +12,8 @@ export interface ObjectiveFunctionFieldProps {
 }
 
 const ObjectiveFunctionField: React.FC<ObjectiveFunctionFieldProps> = ({
-  terms,
   register,
+  terms,
 }) => {
   return (
     <>

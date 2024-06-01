@@ -1,16 +1,5 @@
-import { Term } from "@/core/term.model";
+import { Simplex } from "@/hooks/useSimplex";
 import { createContext } from "react";
-
-export type LimitTerm = {
-  coefficient: number;
-  subindex: number;
-};
-
-export type Standarization = {
-  objectiveFunction: Term[];
-  constraints: Term[][];
-  limits: LimitTerm[];
-};
 
 export type ContextValue = {
   numberOfVariables: {
@@ -21,7 +10,12 @@ export type ContextValue = {
     value: number;
     dispatch: (payload: number) => void;
   };
-  standarization: Standarization | undefined;
+  simplex:
+    | {
+        value: Simplex;
+        dispatch: (payload: Simplex) => void;
+      }
+    | undefined;
 };
 
 export const AppContext = createContext({} as ContextValue);
