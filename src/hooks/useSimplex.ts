@@ -2,7 +2,7 @@ import { ModelFormType } from "@/components";
 import { getBasicVariables } from "@/core/getBasicVariables";
 import { getStandardizedConstraints } from "@/core/getStandardizedConstraints";
 import { getStandardizedObjectiveFunction } from "@/core/getStandardizedObjectiveFunction";
-import { mapObjectiveFunctionFieldToTerms } from "@/core/mapObjectiveFunctionFieldToTerms";
+import { getZj } from "@/core/getZj";
 import { Term } from "@/core/term.model";
 
 export type SolutionTerm = {
@@ -11,8 +11,8 @@ export type SolutionTerm = {
 };
 
 export type TermsOperated = {
-  coefficient: number;
-  isArtificial: boolean;
+  value: number;
+  artificialValue: number;
 };
 
 export type Table = {
@@ -41,10 +41,15 @@ const useSimplex = () => {
     );
     const basicVariables = getBasicVariables(standardizedObjectiveFunction);
 
-    console.log("standardizedObjectiveFunction", { standardizedObjectiveFunction });
+    const zj = getZj(constraintsResults, standardizedConstraints, basicVariables);
+
+    console.log("standardizedObjectiveFunction", {
+      standardizedObjectiveFunction,
+    });
     console.log("standardizedConstraints", { standardizedConstraints });
     console.log("constraintsResults", { constraintsResults });
     console.log("basicVariables", { basicVariables });
+    console.log("zj", { zj });
   };
 
   return {
