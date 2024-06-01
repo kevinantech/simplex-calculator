@@ -3,9 +3,17 @@ import { Term, createTerm } from "./term.model";
 import { EConstraintType, EObjectiveType, EVariableType } from "@/constants";
 
 export const getStandardizedObjectiveFunction = (
-  { constraints, objective }: ModelFormType,
-  objectiveFunction: Term[]
+  { constraints, objective, objectiveFunction }: ModelFormType,
+  objectiveFunctionRender: Term[]
 ) => {
+  /**
+   * Añade los coeficientes de las variable de decisión a la funcion objetivo.
+   */
+  const decisionVariables = objectiveFunctionRender.map((term) => ({
+    ...term,
+    coefficient: objectiveFunction[term.key],
+  }));
+
   const aux: Term[] = [];
   /**
    * Añade las variables de holgura a la funcion objetivo.
@@ -31,8 +39,5 @@ export const getStandardizedObjectiveFunction = (
       );
   });
 
-  return [
-    ...objectiveFunction.map((term) => ({ ...term })),
-    ...aux.map((term) => ({ ...term })),
-  ];
+  return [...decisionVariables, ...aux];
 };

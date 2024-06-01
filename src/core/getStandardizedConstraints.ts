@@ -5,7 +5,6 @@ import { SolutionTerm } from "@/hooks/useSimplex";
 
 export const getStandardizedConstraints = (
   { constraints }: ModelFormType,
-  objectiveFunction: Term[],
   standardizedObjectiveFunction: Term[]
 ): {
   standardizedConstraints: Term[][];
@@ -13,8 +12,13 @@ export const getStandardizedConstraints = (
 } => {
   const standardizedConstraints: Term[][] = [];
   const constraintsResults: SolutionTerm[] = [];
-  const aux = standardizedObjectiveFunction.filter((term) =>
-    objectiveFunction.every((decisionTerm) => decisionTerm.key !== term.key)
+
+  const objectiveFunction: Term[] = standardizedObjectiveFunction.filter(
+    (term) => term.type === EVariableType.NON_BASIC
+  );
+
+  const aux = standardizedObjectiveFunction.filter(
+    (term) => term.type !== EVariableType.NON_BASIC
   );
 
   /**

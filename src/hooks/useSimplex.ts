@@ -1,4 +1,5 @@
 import { ModelFormType } from "@/components";
+import { getBasicVariables } from "@/core/getBasicVariables";
 import { getStandardizedConstraints } from "@/core/getStandardizedConstraints";
 import { getStandardizedObjectiveFunction } from "@/core/getStandardizedObjectiveFunction";
 import { mapObjectiveFunctionFieldToTerms } from "@/core/mapObjectiveFunctionFieldToTerms";
@@ -30,25 +31,20 @@ export type Simplex = {
 
 const useSimplex = () => {
   const handleCalculation = (data: ModelFormType, objectiveFunctionRender: Term[]) => {
-    const objectiveFunction = mapObjectiveFunctionFieldToTerms(
+    const standardizedObjectiveFunction = getStandardizedObjectiveFunction(
       data,
       objectiveFunctionRender
     );
-
-    const standardizedObjectiveFunction = getStandardizedObjectiveFunction(
-      data,
-      objectiveFunction
-    );
-
     const { standardizedConstraints, constraintsResults } = getStandardizedConstraints(
       data,
-      objectiveFunction,
       standardizedObjectiveFunction
     );
+    const basicVariables = getBasicVariables(standardizedObjectiveFunction);
 
     console.log("standardizedObjectiveFunction", { standardizedObjectiveFunction });
     console.log("standardizedConstraints", { standardizedConstraints });
     console.log("constraintsResults", { constraintsResults });
+    console.log("basicVariables", { basicVariables });
   };
 
   return {
