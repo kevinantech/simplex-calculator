@@ -7,6 +7,7 @@ export default function App() {
   const { numberOfVariables, setNumberOfVariablesCallback } = useNumberOfVariables();
   const { numberOfConstraints, setNumberOfConstraintsCallback } =
     useNumberOfConstraints();
+  /* const [standatization, setStandatization] = useState<Standarization>(); */
 
   const value: ContextValue = useMemo(
     () => ({

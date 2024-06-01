@@ -6,7 +6,7 @@ import {
 } from "@/components";
 import { EConstraintType, EObjectiveType, EVariableType } from "@/constants";
 import { AppContext, LimitTerm } from "@/contexts/app.context";
-import { Term } from "@/core/term.model";
+import { Term, createTerm } from "@/core/term.model";
 import React, { useContext, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Loader } from "rsuite";
@@ -30,10 +30,7 @@ export type ModelFormType = {
 
 const generateObjectiveFunction = (length: number): Term[] => {
   const terms: Term[] = [];
-  for (let i = 1; i <= length; i++) {
-    const term = new Term(EVariableType.NON_BASIC, i);
-    terms.push(term);
-  }
+  for (let i = 1; i <= length; i++) terms.push(createTerm(EVariableType.NON_BASIC, i));
   return terms;
 };
 
@@ -49,7 +46,7 @@ const ModelForm: React.FC<ModelFormProps> = () => {
   const { numberOfVariables, numberOfConstraints } = useContext(AppContext);
 
   // Contiene las variables no basicas de la funcion objetivo de manera inicial.
-  const objectiveFunctionMemo = useMemo<Term[]>(
+  const objectiveFunctionRender = useMemo<Term[]>(
     () => generateObjectiveFunction(numberOfVariables.value),
     []
   );
@@ -73,97 +70,76 @@ const ModelForm: React.FC<ModelFormProps> = () => {
     }, 5000);
 
     /**
-     * Añade los coeficientes a las variables de la función objetivo.
+     * Añade los coeficientes a las variables de decisión de la función objetivo.
      */
-    const newObjectiveFunction: Term[] = objectiveFunctionMemo.map((term) => {
-      term.setCoefficient(objectiveFunctionFromData[term.key]);
+    const objectiveFunction: Term[] = objectiveFunctionRender.map((term) => ({
+      ...term,
+      coefficient: objectiveFunctionFromData[term.key],
+    }));
 
-      return term.clone();
+    const aux: Term[] = [];
+    /**
+     * Añade las variables de holgura a la funcion objetivo.
+     */
+    constraints.forEach(({ type }, index) => {
+      const constraintNumber = index + 1;
+      if (type === EConstraintType.MORE || type === EConstraintType.LESS)
+        aux.push(createTerm(EVariableType.SLACK, constraintNumber));
     });
 
     /**
-     * Añade las variables artificiales y de holgura a la funcion objetivo.
-     * TODO: Hacer lo mismo para la minimizacion.
+     * Añade las variables de artificial a la funcion objetivo.
      */
-    const auxiliaryVariables: Term[] = [];
-    if (objective === EObjectiveType.MAX) {
-      // Añade primero las variables de holgura.
-      constraints.forEach(({ type }, index) => {
-        const constraintNumber = index + 1;
-        if (type === EConstraintType.LESS) {
-          auxiliaryVariables.push(new Term(EVariableType.SLACK, constraintNumber));
-        } else if (type === EConstraintType.MORE) {
-          auxiliaryVariables.push(new Term(EVariableType.SLACK, constraintNumber));
-        }
-      });
+    constraints.forEach(({ type }, index) => {
+      const constraintNumber = index + 1;
+      if (type === EConstraintType.MORE || type === EConstraintType.EQUAL)
+        aux.push(
+          createTerm(
+            EVariableType.ARTIFICIAL,
+            constraintNumber,
+            objective === EObjectiveType.MIN ? 1 : -1
+          )
+        );
+    });
 
-      // Añade despues las variables artificiales.
-      constraints.forEach(({ type }, index) => {
-        const constraintNumber = index + 1;
-        if (type === EConstraintType.MORE) {
-          auxiliaryVariables.push(
-            new Term(EVariableType.ARTIFICIAL, constraintNumber, -1, true)
-          );
-        } else if (type === EConstraintType.EQUAL) {
-          auxiliaryVariables.push(
-            new Term(EVariableType.ARTIFICIAL, constraintNumber, -1, true)
-          );
-        }
-      });
-    }
-
-    newObjectiveFunction.push(...auxiliaryVariables);
+    objectiveFunction.push(...aux);
 
     /**
      * Estandariza las restricciones
      */
     let constraintNumber: number = 1;
-    for (const { K, type, ...nonBasicVariables } of constraints) {
+    for (const { K, type, ...decisionVariables } of constraints) {
       /**
-       * Añade los coeficientes de las variables no basicas en cada restricción.
+       * Añade los coeficientes de las variables de decisión para cada restricción.
        */
-      const constraint = objectiveFunctionMemo.map((term) => {
-        for (const key in nonBasicVariables) {
-          if (term.key === key) term.setCoefficient(nonBasicVariables[key]);
-        }
-        return term.clone();
-      });
+      const constraint = objectiveFunctionRender.map((term) => ({
+        ...term,
+        coefficient: decisionVariables[term.key],
+      }));
 
       /**
        * Añade los coeficientes de las variables auxiliares las restricciones;
        */
       constraint.push(
-        ...auxiliaryVariables.map((term) => {
-          const termWithoutRef = term.clone();
-          if (termWithoutRef.subindex === constraintNumber) {
-            if (type === EConstraintType.LESS) {
-              termWithoutRef.setCoefficient(1);
-              return termWithoutRef;
-            }
-            if (
+        ...aux.map((term) => {
+          type CoefficientValue = -1 | 0 | 1;
+          let coefficient: CoefficientValue = 0;
+
+          if (term.subindex === constraintNumber) {
+            if (type === EConstraintType.LESS) coefficient = 1;
+            else if (type === EConstraintType.MORE && term.type === EVariableType.SLACK)
+              coefficient = -1;
+            else if (
               type === EConstraintType.MORE &&
-              termWithoutRef.type === EVariableType.SLACK
-            ) {
-              termWithoutRef.setCoefficient(-1);
-              return termWithoutRef;
-            }
-            if (
-              type === EConstraintType.MORE &&
-              termWithoutRef.type === EVariableType.ARTIFICIAL
-            ) {
-              termWithoutRef.setCoefficient(1);
-              return termWithoutRef;
-            }
-            if (
-              type === EConstraintType.EQUAL &&
-              termWithoutRef.type === EVariableType.ARTIFICIAL
-            ) {
-              termWithoutRef.setCoefficient(1);
-              return termWithoutRef;
-            }
+              term.type === EVariableType.ARTIFICIAL
+            )
+              coefficient = 1;
+
+            if (type === EConstraintType.EQUAL && term.type === EVariableType.ARTIFICIAL)
+              coefficient = 1;
           }
-          termWithoutRef.setCoefficient(0);
-          return termWithoutRef;
+
+          return { ...term, coefficient };
         })
       );
 
@@ -172,7 +148,7 @@ const ModelForm: React.FC<ModelFormProps> = () => {
       constraintNumber++;
     }
 
-    console.log("newObjectiveFunction", { newObjectiveFunction });
+    console.log("newObjectiveFunction", { newObjectiveFunction: objectiveFunction });
     console.log("newConstraints", { newConstraints });
     console.log("limits", { limits });
     /* toggleLoader(); */
@@ -184,13 +160,13 @@ const ModelForm: React.FC<ModelFormProps> = () => {
       onSubmit={handleSubmit(handleCalculation, () => {})}
     >
       <ObjectiveField {...register("objective", { required: true })} />
-      <ObjectiveFunctionField register={register} terms={objectiveFunctionMemo} />
+      <ObjectiveFunctionField register={register} terms={objectiveFunctionRender} />
       {constraintIds.map((constraintId) => (
         <ConstraintField
           key={`ConstraintField-${constraintId}`}
           constraintId={constraintId}
           register={register}
-          terms={objectiveFunctionMemo}
+          terms={objectiveFunctionRender}
           numberOfContraint={constraintId + 1}
         />
       ))}
