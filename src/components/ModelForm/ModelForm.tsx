@@ -5,10 +5,11 @@ import {
   ObjectiveFunctionField,
 } from "@/components";
 import { EConstraintType, EObjectiveType, EVariableType } from "@/constants";
-import { AppContext } from "@/contexts/app.context";
+import { AppContext, LimitTerm } from "@/contexts/app.context";
 import { Term } from "@/core/term.model";
-import React, { useContext, useMemo } from "react";
+import React, { useContext, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
+import { Loader } from "rsuite";
 
 export const parentKeyObjectiveFunction = "objectiveFunction";
 export const parentKeyConstraints = "constraints";
@@ -25,11 +26,6 @@ export type ModelFormType = {
     [keyConstraintType]: EConstraintType;
     [EVariableType.LIMIT]: number; // INDICA EL LIMITE DE LA RESTRICCION
   })[];
-};
-
-export type LimitTerm = {
-  coefficient: number;
-  subindex: number;
 };
 
 const generateObjectiveFunction = (length: number): Term[] => {
@@ -63,18 +59,25 @@ const ModelForm: React.FC<ModelFormProps> = () => {
   );
   const { register, handleSubmit } = useForm<ModelFormType>();
 
-  const handleCalculation = (data: ModelFormType) => {
+  const [loading, setLoading] = useState<boolean>(false);
+  const toggleLoader = () => setLoading((prevState) => !prevState);
+
+  const handleCalculation = async (data: ModelFormType) => {
     const { constraints, objectiveFunction: objectiveFunctionFromData, objective } = data;
     const newConstraints: Term[][] = [];
     const limits: LimitTerm[] = [];
+    toggleLoader();
+
+    setTimeout(() => {
+      toggleLoader();
+    }, 5000);
 
     /**
-     * Añade los coeficientes a las variables no basicas.
+     * Añade los coeficientes a las variables de la función objetivo.
      */
     const newObjectiveFunction: Term[] = objectiveFunctionMemo.map((term) => {
-      for (const key in objectiveFunctionFromData) {
-        if (term.key === key) term.setCoefficient(objectiveFunctionFromData[key]);
-      }
+      term.setCoefficient(objectiveFunctionFromData[term.key]);
+
       return term.clone();
     });
 
@@ -84,12 +87,20 @@ const ModelForm: React.FC<ModelFormProps> = () => {
      */
     const auxiliaryVariables: Term[] = [];
     if (objective === EObjectiveType.MAX) {
+      // Añade primero las variables de holgura.
       constraints.forEach(({ type }, index) => {
         const constraintNumber = index + 1;
         if (type === EConstraintType.LESS) {
           auxiliaryVariables.push(new Term(EVariableType.SLACK, constraintNumber));
         } else if (type === EConstraintType.MORE) {
           auxiliaryVariables.push(new Term(EVariableType.SLACK, constraintNumber));
+        }
+      });
+
+      // Añade despues las variables artificiales.
+      constraints.forEach(({ type }, index) => {
+        const constraintNumber = index + 1;
+        if (type === EConstraintType.MORE) {
           auxiliaryVariables.push(
             new Term(EVariableType.ARTIFICIAL, constraintNumber, -1, true)
           );
@@ -100,6 +111,7 @@ const ModelForm: React.FC<ModelFormProps> = () => {
         }
       });
     }
+
     newObjectiveFunction.push(...auxiliaryVariables);
 
     /**
@@ -163,6 +175,7 @@ const ModelForm: React.FC<ModelFormProps> = () => {
     console.log("newObjectiveFunction", { newObjectiveFunction });
     console.log("newConstraints", { newConstraints });
     console.log("limits", { limits });
+    /* toggleLoader(); */
   };
 
   return (
@@ -184,6 +197,7 @@ const ModelForm: React.FC<ModelFormProps> = () => {
       <Button className="mt-8" type="submit">
         Calcular
       </Button>
+      {loading && <Loader className="mt-4" size="sm" />}
     </form>
   );
 };

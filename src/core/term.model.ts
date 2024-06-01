@@ -1,5 +1,26 @@
 import { EVariableType, termDelimiter } from "@/constants";
 
+export type TermT = {
+  coefficient: number;
+  readonly key: string;
+  readonly type: EVariableType;
+  readonly subindex: number;
+  readonly isArtificial: boolean;
+};
+
+const createTerm = (
+  type: EVariableType,
+  subindex: number,
+  coefficient: number = 0,
+  isArtificial: boolean = false
+): TermT => ({
+  coefficient,
+  isArtificial,
+  key: `${type}-${subindex}`,
+  subindex,
+  type,
+});
+
 export class Term {
   private coefficient: number;
   readonly key: string;
