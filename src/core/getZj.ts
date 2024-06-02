@@ -1,19 +1,19 @@
-import { SolutionTerm, TermsOperated } from "@/hooks/useSimplex";
-import { Term } from "./term.model";
 import { EVariableType } from "@/constants";
+import { TermOperated } from "@/hooks/useSimplex";
+import { Term } from "./term.model";
 
 export const getZj = (
-  constraintsResults: SolutionTerm[],
   standardizedConstraints: Term[][],
   basicVariables: Term[]
-): TermsOperated[] => {
-  const zj: TermsOperated[] = [];
+): TermOperated[] => {
+  const zj: TermOperated[] = [];
 
   for (let column = 0; column < standardizedConstraints[0].length; column++) {
-    const sum: TermsOperated = basicVariables.reduce(
-      (acc: TermsOperated, basicTerm, row) => {
+    const sum: TermOperated = basicVariables.reduce(
+      (acc: TermOperated, basicTerm, row) => {
         const constraintTerm = standardizedConstraints[row][column];
         const result = constraintTerm.coefficient * basicTerm.coefficient;
+        acc.type = constraintTerm.type;
 
         if (basicTerm.type === EVariableType.ARTIFICIAL)
           acc = {
@@ -29,34 +29,10 @@ export const getZj = (
 
         return acc;
       },
-      { artificialValue: 0, value: 0 }
+      { artificialValue: 0, value: 0, type: EVariableType.NON_BASIC }
     );
     zj.push(sum);
   }
 
-  const constraintsResultsZj = basicVariables.reduce(
-    (acc: TermsOperated, basicTerm, column) => {
-      const constraintResultTerm = constraintsResults[column];
-      const result = constraintResultTerm.coefficient * basicTerm.coefficient;
-      const isOneArtificial = basicTerm.type === EVariableType.ARTIFICIAL;
-
-      if (isOneArtificial)
-        acc = {
-          ...acc,
-          artificialValue: acc.artificialValue + result,
-        };
-      else {
-        acc = {
-          ...acc,
-          value: acc.value + result,
-        };
-      }
-
-      return acc;
-    },
-    { artificialValue: 0, value: 0 }
-  );
-
-  zj.unshift(constraintsResultsZj);
   return zj;
 };

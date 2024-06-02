@@ -1,17 +1,14 @@
 import { ModelFormType } from "@/components";
 import { EConstraintType, EVariableType } from "@/constants";
-import { Term } from "./term.model";
-import { SolutionTerm } from "@/hooks/useSimplex";
+import { Term, createTerm } from "./term.model";
 
 export const getStandardizedConstraints = (
   { constraints }: ModelFormType,
   standardizedObjectiveFunction: Term[]
 ): {
   standardizedConstraints: Term[][];
-  constraintsResults: SolutionTerm[];
 } => {
   const standardizedConstraints: Term[][] = [];
-  const constraintsResults: SolutionTerm[] = [];
 
   const objectiveFunction: Term[] = standardizedObjectiveFunction.filter(
     (term) => term.type === EVariableType.NON_BASIC
@@ -58,17 +55,10 @@ export const getStandardizedConstraints = (
         return { ...term, coefficient };
       })
     );
-
+    constraint.push(createTerm(EVariableType.LIMIT, constraintNumber, K));
     standardizedConstraints.push(constraint);
-    constraintsResults.push({
-      coefficient: K,
-      subindex: constraintNumber,
-    });
     constraintNumber++;
   }
 
-  return {
-    standardizedConstraints,
-    constraintsResults,
-  };
+  return { standardizedConstraints };
 };

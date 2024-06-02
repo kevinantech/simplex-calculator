@@ -1,5 +1,7 @@
 import { ModelFormType } from "@/components";
+import { EVariableType } from "@/constants";
 import { getBasicVariables } from "@/core/getBasicVariables";
+import { getCjZj } from "@/core/getCjZj";
 import { getStandardizedConstraints } from "@/core/getStandardizedConstraints";
 import { getStandardizedObjectiveFunction } from "@/core/getStandardizedObjectiveFunction";
 import { getZj } from "@/core/getZj";
@@ -10,17 +12,18 @@ export type SolutionTerm = {
   subindex: number;
 };
 
-export type TermsOperated = {
-  value: number;
+export type TermOperated = {
   artificialValue: number;
+  type: EVariableType;
+  value: number;
 };
 
 export type Table = {
   constraints: Term[][];
   solutions: SolutionTerm[];
   basicVariables: Term[];
-  zj: TermsOperated[];
-  cjzj: TermsOperated[];
+  zj: TermOperated[];
+  cjzj: TermOperated[];
 };
 
 export type Simplex = {
@@ -35,21 +38,21 @@ const useSimplex = () => {
       data,
       objectiveFunctionRender
     );
-    const { standardizedConstraints, constraintsResults } = getStandardizedConstraints(
+    const { standardizedConstraints } = getStandardizedConstraints(
       data,
       standardizedObjectiveFunction
     );
     const basicVariables = getBasicVariables(standardizedObjectiveFunction);
-
-    const zj = getZj(constraintsResults, standardizedConstraints, basicVariables);
+    const zj = getZj(standardizedConstraints, basicVariables);
+    const cjZj = getCjZj(standardizedObjectiveFunction, zj);
 
     console.log("standardizedObjectiveFunction", {
       standardizedObjectiveFunction,
     });
     console.log("standardizedConstraints", { standardizedConstraints });
-    console.log("constraintsResults", { constraintsResults });
     console.log("basicVariables", { basicVariables });
     console.log("zj", { zj });
+    console.log("cjZj", { cjZj });
   };
 
   return {
