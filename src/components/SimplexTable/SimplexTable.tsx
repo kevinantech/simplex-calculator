@@ -1,7 +1,9 @@
+import { EVariableType } from "@/constants";
 import { Term } from "@/core";
 import { Table } from "@/hooks/useSimplex";
 import { getRandomKey } from "@/utils";
 import React from "react";
+import { Td } from "..";
 
 export interface SimplexTableProps {
   numberOfTable: number;
@@ -9,49 +11,70 @@ export interface SimplexTableProps {
   table: Table;
 }
 
-interface TableCellProps {
-  children: React.ReactNode;
-}
-
-const TableCell: React.FC<TableCellProps> = ({ children }) => {
-  return (
-    <td className="min-w-max py-2 px-3 text-center text-base text-white">{children}</td>
-  );
-};
-
 const SimplexTable: React.FC<SimplexTableProps> = ({
   numberOfTable,
   standardizedObjectiveFunction,
   table,
 }) => {
-  const header = (
+  const firstRow = (
     <>
-      <TableCell>
+      <Td isIdentifier border="r">
         <p className="min-w-max">{`Tabla ${numberOfTable}`}</p>
-      </TableCell>
-      <TableCell>
-        <p className="font-semibold">
+      </Td>
+      <Td semibold border="r">
+        <p>
           C<sub>j</sub>
         </p>
-      </TableCell>
+      </Td>
       {standardizedObjectiveFunction.map((term) => {
         return (
-          <TableCell key={[getRandomKey(), getRandomKey()].join("-")}>
+          <Td border="r" key={[getRandomKey(), getRandomKey()].join("-")}>
+            <p>
+              {term.type === EVariableType.ARTIFICIAL
+                ? `${
+                    term.coefficient === -1 || term.coefficient === 1
+                      ? term.coefficient < 0
+                        ? "-"
+                        : ""
+                      : term.coefficient
+                  }M`
+                : term.coefficient}
+            </p>
+          </Td>
+        );
+      })}
+    </>
+  );
+
+  const secondRow = (
+    <>
+      <Td semibold border="r">
+        <p>
+          C<sub>b</sub>
+        </p>
+      </Td>
+      <Td semibold border="r">
+        <p>Base</p>
+      </Td>
+      {standardizedObjectiveFunction.map((term) => {
+        return (
+          <Td semibold border="r" key={[getRandomKey(), getRandomKey()].join("-")}>
             <p>
               {term.type}
               <sub>{term.subindex}</sub>
             </p>
-          </TableCell>
+          </Td>
         );
       })}
-      <TableCell>R</TableCell>
+      <Td semibold>R</Td>
     </>
   );
 
   return (
-    <table className="block w-max mx-auto px-2 border rounded-2xl bg-slate-600 shadow-sm">
+    <table className="block w-max mx-auto border border-white border-opacity-30 rounded-2xl backdrop-blur-[8px] bg-white bg-opacity-15 overflow-hidden shadow-sm">
       <thead>
-        <tr className="rounded-t-2xl">{header}</tr>
+        <tr className="border-b border-white border-opacity-30">{firstRow}</tr>
+        <tr>{secondRow}</tr>
       </thead>
       <tbody></tbody>
     </table>

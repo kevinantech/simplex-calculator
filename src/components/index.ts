@@ -6,5 +6,6 @@ export * from "./ObjectiveField";
 export * from "./ObjectiveFunctionField";
 export * from "./SimplexTable";
 export * from "./StartCard";
+export * from "./Td";
 export * from "./Title";
 export * from "./VarInput";
