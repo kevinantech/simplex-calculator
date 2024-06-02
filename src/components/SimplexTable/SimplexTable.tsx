@@ -10,12 +10,13 @@ export interface SimplexTableProps {
 }
 
 interface TableCellProps {
-  className?: string;
   children: React.ReactNode;
 }
 
 const TableCell: React.FC<TableCellProps> = ({ children }) => {
-  return <td className="min-w-max py-2 px-3 border-y text-center ">{children}</td>;
+  return (
+    <td className="min-w-max py-2 px-3 text-center text-base text-white">{children}</td>
+  );
 };
 
 const SimplexTable: React.FC<SimplexTableProps> = ({
@@ -26,10 +27,10 @@ const SimplexTable: React.FC<SimplexTableProps> = ({
   const header = (
     <>
       <TableCell>
-        <p className="min-w-max">{`Table ${numberOfTable}`}</p>
+        <p className="min-w-max">{`Tabla ${numberOfTable}`}</p>
       </TableCell>
       <TableCell>
-        <p>
+        <p className="font-semibold">
           C<sub>j</sub>
         </p>
       </TableCell>
@@ -48,9 +49,9 @@ const SimplexTable: React.FC<SimplexTableProps> = ({
   );
 
   return (
-    <table className="block w-max mx-auto">
+    <table className="block w-max mx-auto px-2 border rounded-2xl bg-slate-600 shadow-sm">
       <thead>
-        <tr>{header}</tr>
+        <tr className="rounded-t-2xl">{header}</tr>
       </thead>
       <tbody></tbody>
     </table>
