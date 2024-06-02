@@ -31,27 +31,34 @@ export default function App() {
   const isBeginning = numberOfVariables === 0 || numberOfConstraints === 0;
 
   const tables = simplex && (
-    <div>
-      {simplex.tables.map((table) => {
+    <div className="w-[calc(100vh - 2rem)] mx-8 overflow-x-auto">
+      {simplex.tables.map((table, index) => {
         const key = [
           Math.random().toString(16).substring(2, 9),
           Math.random().toString(16).substring(2, 9),
         ].join("-");
-        return <SimplexTable table={table} key={key} />;
+        return (
+          <SimplexTable
+            standardizedObjectiveFunction={simplex.objectiveFunction}
+            table={table}
+            key={key}
+            numberOfTable={index + 1}
+          />
+        );
       })}
     </div>
   );
 
   return (
     <AppContext.Provider value={value}>
-      <main className="flex flex-col items-center mb-16 pt-10">
-        {simplex ? <>Simplex</> : isBeginning ? <StartCard /> : <ModelForm />}
+      <main className="mb-16 pt-10">
+        {simplex ? tables : isBeginning ? <StartCard /> : <ModelForm />}
       </main>
-      <footer className="flex flex-col items-center mb-6">
-        <p className="mb-2 px-10 text-center text-xs text-gray-300">
+      <footer className="mb-6">
+        <p className="mb-2 px-16 text-xs text-center text-gray-300">
           Kevin Gomez, Boris Bello, Diogo Rodriguez, Juan Narvaez & Juan Paternina.
         </p>
-        <p className="text-xs text-gray-300"> © 2024</p>
+        <p className="w-max mx-auto text-xs text-gray-300"> © 2024</p>
       </footer>
     </AppContext.Provider>
   );

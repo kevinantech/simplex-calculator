@@ -20,7 +20,7 @@ const StartCard: React.FC<StartCardProps> = () => {
 
   return (
     <form
-      className="flex flex-col items-center w-80 py-8 rounded-2xl backdrop-blur-[8px] bg-white bg-opacity-15 shadow"
+      className="flex flex-col items-center w-80 py-8 my-0 mx-auto rounded-2xl backdrop-blur-[8px] bg-white bg-opacity-15 shadow"
       onSubmit={handleSubmit((data) => {
         context.numberOfVariables.dispatch(data.numberOfVars);
         context.numberOfConstraints.dispatch(data.numberOfConstraints);

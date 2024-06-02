@@ -38,7 +38,8 @@ const generateConstraintIds = (length: number): number[] => {
 export interface ModelFormProps {}
 
 const ModelForm: React.FC<ModelFormProps> = () => {
-  const { numberOfVariables, numberOfConstraints, simplex } = useContext(AppContext);
+  const { numberOfVariables, numberOfConstraints, handleCalculation } =
+    useContext(AppContext);
 
   // Contiene las variables no basicas de la funcion objetivo de manera inicial.
   const objectiveFunctionRender = useMemo<Term[]>(
@@ -54,28 +55,30 @@ const ModelForm: React.FC<ModelFormProps> = () => {
   const [loading, setLoading] = useState<boolean>(false);
 
   return (
-    <form
-      className="flex flex-col mx-8 items-center py-8 px-10 rounded-2xl backdrop-blur-[8px] bg-white bg-opacity-15 shadow-lg"
-      onSubmit={handleSubmit((data) =>
-        simplex.handleCalculation(data, objectiveFunctionRender)
-      )}
-    >
-      <ObjectiveField {...register("objective", { required: true })} />
-      <ObjectiveFunctionField register={register} terms={objectiveFunctionRender} />
-      {constraintIds.map((constraintId) => (
-        <ConstraintField
-          key={`ConstraintField-${constraintId}`}
-          constraintId={constraintId}
-          register={register}
-          terms={objectiveFunctionRender}
-          numberOfContraint={constraintId + 1}
-        />
-      ))}
-      <Button className="mt-8" type="submit">
-        Calcular
-      </Button>
-      {loading && <Loader className="mt-4" size="sm" />}
-    </form>
+    <div className="w-[calc(100vh - 2rem)] mx-8 rounded-t-2xl overflow-x-auto">
+      <form
+        className="flex flex-col w-max mx-auto items-center py-8 px-10 rounded-2xl backdrop-blur-[8px] bg-white bg-opacity-15 shadow-lg"
+        onSubmit={handleSubmit((data) =>
+          handleCalculation(data, objectiveFunctionRender)
+        )}
+      >
+        <ObjectiveField {...register("objective", { required: true })} />
+        <ObjectiveFunctionField register={register} terms={objectiveFunctionRender} />
+        {constraintIds.map((constraintId) => (
+          <ConstraintField
+            key={`ConstraintField-${constraintId}`}
+            constraintId={constraintId}
+            register={register}
+            terms={objectiveFunctionRender}
+            numberOfContraint={constraintId + 1}
+          />
+        ))}
+        <Button className="mt-8" type="submit">
+          Calcular
+        </Button>
+        {loading && <Loader className="mt-4" size="sm" />}
+      </form>
+    </div>
   );
 };
 
