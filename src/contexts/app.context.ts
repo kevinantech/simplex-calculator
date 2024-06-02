@@ -1,4 +1,5 @@
-import { Simplex } from "@/hooks/useSimplex";
+import { ModelFormType } from "@/components";
+import { Term } from "@/core";
 import { createContext } from "react";
 
 export type ContextValue = {
@@ -10,12 +11,7 @@ export type ContextValue = {
     value: number;
     dispatch: (payload: number) => void;
   };
-  simplex:
-    | {
-        value: Simplex;
-        dispatch: (payload: Simplex) => void;
-      }
-    | undefined;
+  handleCalculation: (data: ModelFormType, objectiveFunctionRender: Term[]) => void;
 };
 
 export const AppContext = createContext({} as ContextValue);

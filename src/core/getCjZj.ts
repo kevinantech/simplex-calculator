@@ -3,10 +3,10 @@ import { Term } from "./term.model";
 import { EVariableType } from "@/constants";
 
 export const getCjZj = (
-  objectiveFunction: Term[],
+  standardizedObjectiveFunction: Term[],
   zj: TermOperated[]
 ): TermOperated[] => {
-  const cjZj: TermOperated[] = objectiveFunction.map((term, index) => {
+  const cjZj: TermOperated[] = standardizedObjectiveFunction.map((term, index) => {
     const currentZj = { ...zj[index] };
 
     const formattedTerm: TermOperated = {

@@ -1,16 +1,9 @@
 import { ModelFormType } from "@/components";
 import { EVariableType } from "@/constants";
-import { getBasicVariables } from "@/core/getBasicVariables";
-import { getCjZj } from "@/core/getCjZj";
-import { getStandardizedConstraints } from "@/core/getStandardizedConstraints";
+import { getInitialTable } from "@/core";
 import { getStandardizedObjectiveFunction } from "@/core/getStandardizedObjectiveFunction";
-import { getZj } from "@/core/getZj";
 import { Term } from "@/core/term.model";
-
-export type SolutionTerm = {
-  coefficient: number;
-  subindex: number;
-};
+import { useState } from "react";
 
 export type TermOperated = {
   artificialValue: number;
@@ -19,11 +12,10 @@ export type TermOperated = {
 };
 
 export type Table = {
-  constraints: Term[][];
-  solutions: SolutionTerm[];
   basicVariables: Term[];
-  zj: TermOperated[];
   cjzj: TermOperated[];
+  standardizedConstraints: Term[][];
+  zj: TermOperated[];
 };
 
 export type Simplex = {
@@ -33,30 +25,33 @@ export type Simplex = {
 };
 
 const useSimplex = () => {
+  const [simplex, setSimplex] = useState<Simplex>();
+
   const handleCalculation = (data: ModelFormType, objectiveFunctionRender: Term[]) => {
+    const tables: Table[] = [];
+
     const standardizedObjectiveFunction = getStandardizedObjectiveFunction(
       data,
       objectiveFunctionRender
     );
-    const { standardizedConstraints } = getStandardizedConstraints(
-      data,
-      standardizedObjectiveFunction
-    );
-    const basicVariables = getBasicVariables(standardizedObjectiveFunction);
-    const zj = getZj(standardizedConstraints, basicVariables);
-    const cjZj = getCjZj(standardizedObjectiveFunction, zj);
 
-    console.log("standardizedObjectiveFunction", {
-      standardizedObjectiveFunction,
+    const initialTable = getInitialTable(data, standardizedObjectiveFunction);
+    tables.push(initialTable);
+
+    console.log("initialTable", {
+      initialTable,
     });
-    console.log("standardizedConstraints", { standardizedConstraints });
-    console.log("basicVariables", { basicVariables });
-    console.log("zj", { zj });
-    console.log("cjZj", { cjZj });
+
+    setSimplex({
+      objectiveFunction: standardizedObjectiveFunction,
+      solution: [],
+      tables,
+    });
   };
 
   return {
     handleCalculation,
+    simplex,
   };
 };
 

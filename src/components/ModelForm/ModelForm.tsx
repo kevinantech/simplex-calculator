@@ -35,12 +35,10 @@ const generateConstraintIds = (length: number): number[] => {
   return constraintIds;
 };
 
-export interface ModelFormProps {
-  handleCalculation: (data: ModelFormType, objectiveFunctionRender: Term[]) => void;
-}
+export interface ModelFormProps {}
 
-const ModelForm: React.FC<ModelFormProps> = ({ handleCalculation }) => {
-  const { numberOfVariables, numberOfConstraints } = useContext(AppContext);
+const ModelForm: React.FC<ModelFormProps> = () => {
+  const { numberOfVariables, numberOfConstraints, simplex } = useContext(AppContext);
 
   // Contiene las variables no basicas de la funcion objetivo de manera inicial.
   const objectiveFunctionRender = useMemo<Term[]>(
@@ -58,7 +56,9 @@ const ModelForm: React.FC<ModelFormProps> = ({ handleCalculation }) => {
   return (
     <form
       className="flex flex-col mx-8 items-center py-8 px-10 rounded-2xl backdrop-blur-[8px] bg-white bg-opacity-15 shadow-lg"
-      onSubmit={handleSubmit((data) => handleCalculation(data, objectiveFunctionRender))}
+      onSubmit={handleSubmit((data) =>
+        simplex.handleCalculation(data, objectiveFunctionRender)
+      )}
     >
       <ObjectiveField {...register("objective", { required: true })} />
       <ObjectiveFunctionField register={register} terms={objectiveFunctionRender} />
