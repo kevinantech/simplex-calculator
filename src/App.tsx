@@ -33,16 +33,12 @@ export default function App() {
   const tables = simplex && (
     <div className="w-[calc(100vh - 2rem)] mx-8 overflow-x-auto">
       {simplex.tables.map((table, index) => {
-        const key = [
-          Math.random().toString(16).substring(2, 9),
-          Math.random().toString(16).substring(2, 9),
-        ].join("-");
         return (
           <SimplexTable
+            key={table.id}
+            numberOfTable={index + 1}
             standardizedObjectiveFunction={simplex.objectiveFunction}
             table={table}
-            key={key}
-            numberOfTable={index + 1}
           />
         );
       })}

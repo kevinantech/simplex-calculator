@@ -12,6 +12,7 @@ export type TermOperated = {
 };
 
 export type Table = {
+  id: string;
   basicVariables: Term[];
   cjzj: TermOperated[];
   standardizedConstraints: Term[][];
@@ -21,31 +22,25 @@ export type Table = {
 export type Simplex = {
   objectiveFunction: Term[];
   tables: Table[];
-  solution: Term[];
+  /* solution: Term[]; */
 };
 
 const useSimplex = () => {
   const [simplex, setSimplex] = useState<Simplex>();
 
   const handleCalculation = (data: ModelFormType, objectiveFunctionRender: Term[]) => {
-    const tables: Table[] = [];
-
     const standardizedObjectiveFunction = getStandardizedObjectiveFunction(
       data,
       objectiveFunctionRender
     );
 
-    const initialTable = getInitialTable(data, standardizedObjectiveFunction);
-    tables.push(initialTable);
-
-    console.log("initialTable", {
-      initialTable,
+    console.log({
+      getInitialTableResult: getInitialTable(data, standardizedObjectiveFunction),
     });
 
     setSimplex({
       objectiveFunction: standardizedObjectiveFunction,
-      solution: [],
-      tables,
+      tables: [getInitialTable(data, standardizedObjectiveFunction)],
     });
   };
 
