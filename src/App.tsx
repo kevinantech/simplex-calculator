@@ -30,20 +30,18 @@ export default function App() {
   );
   const isBeginning = numberOfVariables === 0 || numberOfConstraints === 0;
 
-  const tables = simplex && (
-    <div className="w-[calc(100vh - 2rem)] mx-8 overflow-x-auto">
-      {simplex.tables.map((table, index) => {
-        return (
-          <SimplexTable
-            key={table.id}
-            numberOfTable={index + 1}
-            standardizedObjectiveFunction={simplex.objectiveFunction}
-            table={table}
-          />
-        );
-      })}
-    </div>
-  );
+  const tables =
+    simplex &&
+    simplex.tables.map((table, index) => {
+      return (
+        <SimplexTable
+          key={table.id}
+          n={index + 1}
+          standardizedObjectiveFunction={simplex.objectiveFunction}
+          table={table}
+        />
+      );
+    });
 
   return (
     <AppContext.Provider value={value}>

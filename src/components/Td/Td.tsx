@@ -4,9 +4,10 @@ type Rounded = "tl" | "tr" | "bl" | "br";
 type BorderSide = "l" | "t" | "r" | "b";
 
 export interface TdProps {
-  children: React.ReactNode;
+  children?: React.ReactNode;
   border?: BorderSide;
   decoration?: boolean;
+  empty?: boolean;
   isIdentifier?: boolean;
   rounded?: Rounded;
 }
@@ -15,6 +16,7 @@ const Td: React.FC<TdProps> = ({
   children,
   border,
   decoration,
+  empty,
   isIdentifier,
   rounded,
 }) => {
@@ -31,7 +33,7 @@ const Td: React.FC<TdProps> = ({
 				${rounded === "br" ? "rounded-br-2xl" : ""} ${rounded === "bl" ? "rounded-bl-2xl" : ""}
 			`}
     >
-      {children}
+      {empty ? "" : children}
     </td>
   );
 };

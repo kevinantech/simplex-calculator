@@ -2,6 +2,7 @@ export * from "./generateObjectiveFunction";
 export * from "./getBasicVariables";
 export * from "./getCjZj";
 export * from "./getInitialTable";
+export * from "./getIterations";
 export * from "./getStandardizedConstraints";
 export * from "./getStandardizedObjectiveFunction";
 export * from "./getZj";

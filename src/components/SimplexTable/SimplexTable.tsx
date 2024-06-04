@@ -1,45 +1,38 @@
 import { EVariableType } from "@/constants";
 import { Term } from "@/core";
 import { Table } from "@/hooks/useSimplex";
-import { getRandomKey } from "@/utils";
+import { getArtificialCoefficientM } from "@/utils/getArtificialCoefficient";
 import React from "react";
 import { Td } from "..";
 
 export interface SimplexTableProps {
-  numberOfTable: number;
+  n: number;
   standardizedObjectiveFunction: Term[];
   table: Table;
 }
 
 const SimplexTable: React.FC<SimplexTableProps> = ({
-  numberOfTable,
+  n,
   standardizedObjectiveFunction,
   table,
 }) => {
   const { basicVariables, standardizedConstraints, zj, cjzj } = table;
 
-  const firstRow = (
+  const CjRow = (
     <>
       <Td isIdentifier border="r">
-        <p className="min-w-max">{`Tabla ${numberOfTable}`}</p>
+        Tabla {n}
       </Td>
       <Td decoration border="r">
-        <p>
-          C<sub>j</sub>
-        </p>
+        C<sub>j</sub>
       </Td>
       {standardizedObjectiveFunction.map((term) => {
+        const key = [table.id, "CjRow", term.key].join("-");
         return (
-          <Td border="r" key={[getRandomKey(), getRandomKey()].join("-")}>
+          <Td border="r" key={key}>
             <p>
               {term.type === EVariableType.ARTIFICIAL
-                ? `${
-                    term.coefficient === -1 || term.coefficient === 1
-                      ? term.coefficient < 0
-                        ? "-"
-                        : ""
-                      : term.coefficient
-                  }M`
+                ? getArtificialCoefficientM(term.coefficient)
                 : term.coefficient}
             </p>
           </Td>
@@ -48,23 +41,20 @@ const SimplexTable: React.FC<SimplexTableProps> = ({
     </>
   );
 
-  const secondRow = (
+  const varsRow = (
     <>
       <Td decoration border="r">
-        <p>
-          C<sub>b</sub>
-        </p>
+        C<sub>b</sub>
       </Td>
       <Td decoration border="r">
-        <p>Base</p>
+        Base
       </Td>
       {standardizedObjectiveFunction.map((term) => {
+        const key = [table.id, "varsRow", term.key].join("-");
         return (
-          <Td decoration border="r" key={[getRandomKey(), getRandomKey()].join("-")}>
-            <p>
-              {term.type}
-              <sub>{term.subindex}</sub>
-            </p>
+          <Td decoration border="r" key={key}>
+            {term.type}
+            <sub>{term.subindex}</sub>
           </Td>
         );
       })}
@@ -74,32 +64,23 @@ const SimplexTable: React.FC<SimplexTableProps> = ({
 
   const constraintsRows = standardizedConstraints.map((standardizedConstraint, index) => {
     const { coefficient, subindex, type } = basicVariables[index];
+    const key = [table.id, "constraintsRow", index].join("-");
     return (
-      <tr
-        className="border-b border-white border-opacity-30"
-        key={[getRandomKey(), getRandomKey].join("-")}
-      >
+      <tr className="border-b border-white border-opacity-30" key={key}>
         <Td border="r">
           {type === EVariableType.ARTIFICIAL
-            ? coefficient === 1 || coefficient === -1
-              ? coefficient < 0
-                ? "-M"
-                : "M"
-              : `${coefficient}M`
+            ? getArtificialCoefficientM(coefficient)
             : coefficient}
         </Td>
         <Td decoration border="r">
-          <p>
-            {type} <sub>{subindex}</sub>
-          </p>
+          {type}
+          <sub>{subindex}</sub>
         </Td>
         {standardizedConstraint.map((term, index) => {
           const isLastIndex = index + 1 === standardizedConstraint.length;
+          const childrenKey = [key, term.key].join("-");
           return (
-            <Td
-              border={isLastIndex ? undefined : "r"}
-              key={[getRandomKey(), getRandomKey].join("-")}
-            >
+            <Td border={isLastIndex ? undefined : "r"} key={childrenKey}>
               {term.coefficient}
             </Td>
           );
@@ -108,75 +89,72 @@ const SimplexTable: React.FC<SimplexTableProps> = ({
     );
   });
 
-  const firstLastRow = (
+  const ZjRow = (
     <>
-      <Td border="r">{""}</Td>
+      <Td border="r" empty />
       <Td decoration border="r">
-        <p>
-          C<sub>j</sub>
-          {" - "}Z <sub>j</sub>
-        </p>
-      </Td>
-      {cjzj.map(({ value, artificialValue }) => {
-        const m =
-          artificialValue !== 0
-            ? artificialValue === 1 || artificialValue === -1
-              ? artificialValue < 0
-                ? "-M"
-                : "M"
-              : artificialValue + "M"
-            : "";
-
-        const c = value !== 0 ? value + "" : "";
-
-        return (
-          <Td border="r">
-            {c && m && !m.includes("-") ? c + "+" + m : !c && !m ? 0 : c + m}
-          </Td>
-        );
-      })}
-      <Td>{""}</Td>
-    </>
-  );
-
-  const secondLastRow = (
-    <>
-      <Td border="r">{""}</Td>
-      <Td decoration border="r">
-        <p>
-          Z<sub>j</sub>
-        </p>
+        Z<sub>j</sub>
       </Td>
       {zj.map(({ value, artificialValue }, index) => {
         const isLastIndex = index + 1 === zj.length;
-        const m =
-          artificialValue !== 0
-            ? artificialValue === 1 || artificialValue === -1
-              ? artificialValue < 0
-                ? "-M"
-                : "M"
-              : artificialValue + "M"
-            : "";
-
-        const c = value !== 0 ? value + "" : "";
-
+        const m = getArtificialCoefficientM(artificialValue);
+        const key = [table.id, "ZjRow", index].join("-");
         return (
-          <Td border={isLastIndex ? undefined : "r"}>
-            {c && m && !m.includes("-") ? c + "+" + m : !c && !m ? 0 : c + m}
+          <Td border={isLastIndex ? undefined : "r"} key={key}>
+            {value && m
+              ? artificialValue > 0
+                ? value + "+" + m
+                : value + m
+              : value
+              ? value
+              : m
+              ? m
+              : 0}
           </Td>
         );
       })}
+    </>
+  );
+
+  const CjZjRow = (
+    <>
+      <Td border="r" empty />
+      <Td border="r" decoration>
+        C<sub>j</sub> - Z<sub>j</sub>
+      </Td>
+      {cjzj.map(({ value, artificialValue }, index) => {
+        const m = getArtificialCoefficientM(artificialValue);
+        const key = [table.id, "CjZjRow", index].join("-");
+        return (
+          <Td border="r" key={key}>
+            {value && m
+              ? artificialValue > 0
+                ? value + "+" + m
+                : value + m
+              : value
+              ? value
+              : m
+              ? m
+              : 0}
+          </Td>
+        );
+      })}
+      <Td empty />
     </>
   );
 
   return (
-    <table className="block w-max mx-auto border border-white border-opacity-30 rounded-2xl backdrop-blur-[8px] bg-white bg-opacity-15 overflow-hidden shadow-sm">
-      <tr className="border-b border-white border-opacity-30">{firstRow}</tr>
-      <tr className="border-b border-white border-opacity-30">{secondRow}</tr>
-      {constraintsRows}
-      <tr className="border-b border-white border-opacity-30">{secondLastRow}</tr>
-      <tr>{firstLastRow}</tr>
-    </table>
+    <div className="w-[calc(100vh - 2rem)] mx-8 overflow-x-auto">
+      <table className="block w-max mx-auto border border-white border-opacity-30 rounded-2xl backdrop-blur-[8px] bg-white bg-opacity-15 overflow-hidden shadow-sm">
+        <tbody>
+          <tr className="border-b border-white border-opacity-30">{CjRow}</tr>
+          <tr className="border-b border-white border-opacity-30">{varsRow}</tr>
+          {constraintsRows}
+          <tr className="border-b border-white border-opacity-30">{ZjRow}</tr>
+          <tr>{CjZjRow}</tr>
+        </tbody>
+      </table>
+    </div>
   );
 };
 
