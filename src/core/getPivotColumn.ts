@@ -1,11 +1,6 @@
 import { EObjective } from "@/constants";
 import { TermOperated } from "@/hooks/useSimplex";
 
-/**
- *
- * @param objective
- */
-
 type T = TermOperated & { index: number };
 
 export const getPivotColumn = (
