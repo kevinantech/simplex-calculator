@@ -1,6 +1,6 @@
 import { ModelFormType } from "@/components";
 import { Term, createTerm } from "./term.model";
-import { EConstraintType, EObjectiveType, EVariableType } from "@/constants";
+import { EConstraintType, EObjective, EVariableType } from "@/constants";
 
 export const getStandardizedObjectiveFunction = (
   { constraints, objective, objectiveFunction }: ModelFormType,
@@ -34,7 +34,7 @@ export const getStandardizedObjectiveFunction = (
         createTerm(
           EVariableType.ARTIFICIAL,
           constraintNumber,
-          objective === EObjectiveType.MIN ? 1 : -1
+          objective === EObjective.MIN ? 1 : -1
         )
       );
   });

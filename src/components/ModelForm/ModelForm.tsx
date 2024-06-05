@@ -4,7 +4,7 @@ import {
   ObjectiveField,
   ObjectiveFunctionField,
 } from "@/components";
-import { EConstraintType, EObjectiveType, EVariableType } from "@/constants";
+import { EConstraintType, EObjective, EVariableType } from "@/constants";
 import { AppContext } from "@/contexts/app.context";
 import { generateObjectiveFunction } from "@/core/generateObjectiveFunction";
 import { Term } from "@/core/term.model";
@@ -17,7 +17,7 @@ export const parentKeyConstraints = "constraints";
 export const keyConstraintType = "type";
 
 export type ModelFormType = {
-  objective: EObjectiveType;
+  objective: EObjective;
   [parentKeyObjectiveFunction]: {
     [key: string]: number;
   };

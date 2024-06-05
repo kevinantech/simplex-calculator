@@ -1,6 +1,6 @@
 import { ModelFormType } from "@/components";
 import { EVariableType } from "@/constants";
-import { getInitialTable } from "@/core";
+import { getInitialTable, getIterations } from "@/core";
 import { getStandardizedObjectiveFunction } from "@/core/getStandardizedObjectiveFunction";
 import { Term } from "@/core/term.model";
 import { useState } from "react";
@@ -34,13 +34,16 @@ const useSimplex = () => {
       objectiveFunctionRender
     );
 
-    console.log({
-      getInitialTableResult: getInitialTable(data, standardizedObjectiveFunction),
-    });
+    const { tables } = getIterations(
+      data.objective,
+      getInitialTable(data, standardizedObjectiveFunction)
+    );
+
+    console.log({ tables });
 
     setSimplex({
       objectiveFunction: standardizedObjectiveFunction,
-      tables: [getInitialTable(data, standardizedObjectiveFunction)],
+      tables,
     });
   };
 
