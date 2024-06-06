@@ -1,7 +1,6 @@
+import { EObjective } from "@/constants";
 import { Table } from "@/hooks/useSimplex";
 import { Term } from ".";
-import { EObjective } from "@/constants";
-import { optimalityTest } from "./optimalityTest";
 import { getPivotColumn } from "./getPivotColumn";
 import { getPivotRow } from "./getPivotRow";
 
@@ -23,15 +22,17 @@ export const getIterations = (
   const solution: Term[] = [];
   let error: SimplexError | undefined = undefined;
 
-  const pivotColumn = getPivotColumn(objective, initial.cjzj);
-  const pivotRow = getPivotRow(initial.standardizedConstraints, pivotColumn);
+  let index: number = 0;
+  do {
+    const pivotColumn = getPivotColumn(objective, tables[index].cjzj);
+    if (pivotColumn === -1) error = SimplexError.COLUMN;
 
-  console.log({ pivotColumn, pivotRow });
+    const pivotRow = getPivotRow(tables[index].standardizedConstraints, pivotColumn);
+    if (pivotRow === -1) error = SimplexError.COLUMN;
 
-  while (/* !optimalityTest(objective, getCjZjFromLastTable()) || !error */ error) {
-    /* TODO: Buscar el CjZj mas positivo en caso max y min */
-    error = SimplexError.COLUMN;
-  }
+    index++;
+  } while (!error);
+
   return {
     tables,
     solution,
